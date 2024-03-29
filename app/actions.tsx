@@ -1,18 +1,25 @@
+// toUppercase.ts
 "use server";
-import prisma from "@/app/lib/prisma";
 
-export const addText = async (formData: FormData) => {
-  const text = formData.get("inputText") as string;
-  if (!text) {
-    return { error: "Please enter some text to process." };
-  }
+interface CommonActionsReturn {
+  success: boolean;
+  message: string;
+  data: string;
+}
 
-  await prisma.texts.create({
-    data: {
-      text: text,
-    },
-  });
-  console.log("Processing text:", text);
-  // Process the text and return the result
-  return { text };
-};
+export default async function toUppercase(
+  text: FormDataEntryValue | null
+): Promise<CommonActionsReturn> {
+  // 実際の処理
+  // Process the text using the OpenAI API and return the result
+  if (!text)
+    return {
+      success: false,
+      message: "Please enter some text to process.",
+      data: "",
+    };
+
+  const _text: string = (text as string).toUpperCase();
+
+  return { success: true, message: "success", data: _text };
+}

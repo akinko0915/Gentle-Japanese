@@ -1,11 +1,7 @@
-export function ResultBox({ simplifiedText }: { simplifiedText?: string }) {
+export function ResultBox({ result }: { result?: string }) {
   return (
     <div className="result rounded-md">
-      {simplifiedText ? (
-        <p>{simplifiedText}</p>
-      ) : (
-        <p>変換結果がここに表示されます。</p>
-      )}
+      {result ? <p>{result}</p> : <p>変換結果がここに表示されます。</p>}
     </div>
   );
 }

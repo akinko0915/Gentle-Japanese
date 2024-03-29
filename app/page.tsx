@@ -1,45 +1,29 @@
-import { revalidatePath } from "next/cache";
+"use client";
+
+import { useState } from "react";
 import { ResultBox } from "./Result";
-import { PrismaClient } from "@prisma/client/extension";
+import toUppercase from "./actions";
 
-const prisma = new PrismaClient();
-
-async function processTextWithOpenAI(text: string): Promise<string> {
-  // Process the text using the OpenAI API and return the result
-  // ...
-  const simplifiedText = text.toUpperCase();
-  return simplifiedText;
+interface CommonActionsReturn {
+  success: boolean;
+  message: string;
+  data: string;
 }
 
-async function convert(formData: FormData) {
-  "use server";
-  const text = formData.get("inputText") as string;
-  if (!text) {
-    return { error: "Please enter some text to process." };
-  }
+export default function Home() {
+  const convert = async (formData: FormData) => {
+    const text: FormDataEntryValue | null = formData.get("inputText");
 
-  console.log("Processing text:", text);
-  // Process the text using the OpenAI API and return the result
-  const result = await processTextWithOpenAI(text);
+    const result: CommonActionsReturn = await toUppercase(text);
 
-  const convertedText = await prisma.texts.create({
-    data: {
-      text: result,
-    },
-  });
+    if (result.success) {
+      setResultText(result.data);
+    } else {
+      // エラー処理
+    }
+  };
 
-  revalidatePath("/");
-  return { result: convertedText.text };
-}
-
-export default async function Home() {
-  const latestText = await prisma.texts.findFirst({
-    orderBy: {
-      id: "desc",
-    },
-  });
-
-  const resultText = latestText?.text;
+  const [resultText, setResultText] = useState<string>("");
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
@@ -62,7 +46,7 @@ export default async function Home() {
               <h2 className="text-xl font-semibold">へんかん！</h2>
             </button>
           </form>
-          <ResultBox simplifiedText={resultText} />
+          <ResultBox result={resultText} />
         </div>
       </div>
     </main>
